@@ -14,6 +14,7 @@ Route::prefix('auth')->group(function () {
     Route::middleware('auth:sanctum')->post('/logout', [LogoutController::class, 'logout'])->name('logout');
 });
 
+
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/profile', function (Request $request) {
         return auth()->user();
@@ -23,6 +24,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/', [PlaceController::class, 'create']);
         Route::delete('/{id}', [PlaceController::class, 'delete']);
         Route::get('/{id}', [PlaceController::class, 'show']);
+        Route::put('/{id}', [PlaceController::class, 'update']);
     });
     Route::middleware('admin')->group(function () {
         Route::get('/admin', function (Request $request) {

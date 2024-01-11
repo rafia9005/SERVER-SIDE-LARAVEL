@@ -74,16 +74,40 @@ class PlaceController extends Controller
     public function update(Request $request, $id)
     {
         $validator = Validator::make($request->all(), [
-            'name' => 'required|string',
-            'latitude' => 'required',
-            'longitude' => 'required',
-            'image_path' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:204',
-            'description' => 'required|string'
+            'name' => 'string',
+            'latitude' => 'string',
+            'longitude' => 'string',
+            'image_path' => 'nullable|image',
+            'description' => 'string'
         ]);
 
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
         $place = Place::find($id);
+
         if (!$place) {
             return response()->json(['message' => 'Place not found'], 404);
         }
+
+        $place->name = $request->name;
+        $place->latitude = $request->latitude;
+        $place->longitude = $request->longitude;
+
+        // image update
+        $imagePath = $request->file('image_path')->store('public/image/place');
+        $place->image_path = $imagePath;
+        $place->description = $request->description;
+
+        $place->save();
+
+        return response()->json([
+            'message' => 'Place updated successfully',
+            'status' => 200,
+            'data' => $place
+        ], 200);
     }
+
+
 }
